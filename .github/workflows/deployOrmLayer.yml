@@ -20,6 +20,17 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
       - uses: nelonoel/branch-name@v1.0.1
+      - name: Get env DB secret
+        uses: say8425/aws-secrets-manager-actions@v2
+        with:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          SECRET_NAME: ${{ secrets.SECRET_NAME }}
       - run: npm ci
+        working-directory: layers/orm-layer/nodejs
+      - run: npx sequelize-cli db:migrate --env ${{ env.BRANCH_NAME }}
+        working-directory: layers/orm-layer/nodejs/db
+      - run: npx sequelize-cli db:seed -e ${{ env.BRANCH_NAME }}
         working-directory: layers/orm-layer/nodejs
       - run: npx serverless deploy --stage ${{ env.BRANCH_NAME }}
