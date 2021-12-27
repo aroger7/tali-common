@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const App = sequelize.define('app', {
+  const App = sequelize.define('App', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: false },
     name: { type: DataTypes.STRING, allowNull: false },
     current: { type: DataTypes.INTEGER, defaultValue: 0 },
@@ -7,6 +7,9 @@ module.exports = (sequelize, DataTypes) => {
     average24Hours: { type: DataTypes.NUMERIC(15,2) },
     peak: { type: DataTypes.INTEGER },
     peak24Hours: { type: DataTypes.INTEGER }
+  },
+  {
+    tableName: 'apps'
   });
 
   App.associate = (models) => {

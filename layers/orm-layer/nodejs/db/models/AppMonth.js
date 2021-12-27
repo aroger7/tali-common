@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const AppMonth = sequelize.define('appMonth', {
+  const AppMonth = sequelize.define('AppMonth', {
     year: { type: DataTypes.INTEGER },
     month: { type: DataTypes.INTEGER },
     average: { type: DataTypes.NUMERIC(15, 2) },
@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     percentGain: { type: DataTypes.NUMERIC(10, 2) }
   },
   {
+    tableName: 'app_months',
     indexes: [
       {
         unique: true,

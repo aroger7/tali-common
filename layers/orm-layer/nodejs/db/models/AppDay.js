@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const AppDay = sequelize.define('appDay', {
+  const AppDay = sequelize.define('AppDay', {
     year: { type: DataTypes.INTEGER },
     month: { type: DataTypes.INTEGER },
     day: { type: DataTypes.INTEGER },
@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
     percentGain: { type: DataTypes.NUMERIC(10, 2) }
   },
   {
+    tableName: 'app_days',
     indexes: [
       { 
         unique: true,
