@@ -47,8 +47,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-          cache: 'npm'
-          cache-dependency-path: layers/orm-layer/nodejs
       - uses: nelonoel/branch-name@v1.0.1
       - uses: actions/cache@v2
         if: ${{ !env.ACT }}
