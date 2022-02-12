@@ -13,7 +13,7 @@ jobs:
   package:
     name: Package ORM layer
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ env.BRANCH_NAME }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -41,7 +41,7 @@ jobs:
     name: Run DB migrations and seed scripts
     needs: [package]
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ env.BRANCH_NAME }}
     defaults:
       run:
         working-directory: layers/orm-layer/nodejs
