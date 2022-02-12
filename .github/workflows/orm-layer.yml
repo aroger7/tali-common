@@ -30,8 +30,7 @@ jobs:
     name: Package ORM layer
     runs-on: ubuntu-latest
     needs: [get-env]
-    environment: 
-      name: ${{ needs.get-env.outputs.env }}
+    environment: ${{ needs.get-env.outputs.env }}
     steps:
       - run: echo ${{ needs.get-env.outputs.env }}
       - uses: actions/checkout@v2
@@ -60,8 +59,7 @@ jobs:
     name: Run DB migrations and seed scripts
     needs: [package]
     runs-on: ubuntu-latest
-    environment: 
-      name: ${{ needs.get-env.outputs.env }}
+    environment: ${{ needs.get-env.outputs.env }}
     defaults:
       run:
         working-directory: layers/orm-layer/nodejs
