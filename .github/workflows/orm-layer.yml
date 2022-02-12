@@ -13,6 +13,7 @@ jobs:
   package:
     name: Package ORM layer
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -38,6 +39,7 @@ jobs:
     name: Run DB migrations and seed scripts
     needs: [package]
     runs-on: ubuntu-latest
+    environment: dev
     defaults:
       run:
         working-directory: layers/orm-layer/nodejs
@@ -59,6 +61,9 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('layers/orm-layer/serverless.yml') }}
       # - run: npm ci
       #   working-directory: layers/orm-layer/nodejs
+      - name: Secret exists?
+        if: ${{ secrets.AWS_DEFAULT_REGION === "us-east-1" }}
+        run: echo "It's set"
       - name: Get env DB secret
         uses: say8425/aws-secrets-manager-actions@v2
         with:
