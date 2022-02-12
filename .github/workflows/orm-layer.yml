@@ -38,7 +38,6 @@ jobs:
     name: Run DB migrations and seed scripts
     needs: [package]
     runs-on: ubuntu-latest
-    environment: ${{ env.BRANCH_NAME }}
     defaults:
       run:
         working-directory: layers/orm-layer/nodejs
