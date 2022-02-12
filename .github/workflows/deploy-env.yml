@@ -18,6 +18,6 @@ jobs:
       - run: echo ::set-output name=env::${{ env.BRANCH_NAME }}
   deploy:
     needs: [get-env]
-    uses: aroger7/tali-common/.github/workflows/orm-layer.yml@main
+    uses: aroger7/tali-common/.github/workflows/orm-layer.yml@v1
     with:
      env: ${{ needs.get-env.outputs.env }}
