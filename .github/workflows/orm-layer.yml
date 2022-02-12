@@ -34,35 +34,45 @@ jobs:
           path: layers/orm-layer/.serverless
           key: ${{ runner.os }}-${{ hashFiles('layers/orm-layer/serverless.yml') }}
 
-  # run-db-updates:
-  #   name: Run DB migrations and seed scripts
-  #   needs: [package]
-  #   runs-on: ubuntu-latest
-  #   environment: ${{ env.BRANCH_NAME }}
-  #   defaults:
-  #     run:
-  #       working-directory: layers/orm-layer/nodejs
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: '14'
-  #         cache: 'npm'
-  #         cache-dependency-path: layers/orm-layer/nodejs
-  #     - uses: nelonoel/branch-name@v1.0.1
-  #     - run: npm ci
-  #       working-directory: layers/orm-layer/nodejs
-  #     - name: Get env DB secret
-  #       uses: say8425/aws-secrets-manager-actions@v2
-  #       with:
-  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-  #         SECRET_NAME: ${{ secrets.SECRET_NAME }}
-  #     - run: npx sequelize-cli db:migrate --env ${{ env.BRANCH_NAME }}
-  #       working-directory: layers/orm-layer/nodejs/db
-  #     - run: npx sequelize-cli db:seed --env ${{ env.BRANCH_NAME }}
-  #       working-directory: layers/orm-layer/nodejs/db
+  run-db-updates:
+    name: Run DB migrations and seed scripts
+    needs: [package]
+    runs-on: ubuntu-latest
+    environment: ${{ env.BRANCH_NAME }}
+    defaults:
+      run:
+        working-directory: layers/orm-layer/nodejs
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'npm'
+          cache-dependency-path: layers/orm-layer/nodejs
+      - uses: nelonoel/branch-name@v1.0.1
+      - uses: actions/cache@v2
+        if: ${{ !env.ACT }}
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+      - uses: actions/cache@v2
+        if: ${{ !env.ACT }}
+        with:
+          path: layers/orm-layer/.serverless
+          key: ${{ runner.os }}-${{ hashFiles('layers/orm-layer/serverless.yml') }}
+      # - run: npm ci
+      #   working-directory: layers/orm-layer/nodejs
+      - name: Get env DB secret
+        uses: say8425/aws-secrets-manager-actions@v2
+        with:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+          SECRET_NAME: ${{ secrets.SECRET_NAME }}
+      - run: npx sequelize-cli db:migrate --env ${{ env.BRANCH_NAME }}
+        working-directory: layers/orm-layer/nodejs/db
+      - run: npx sequelize-cli db:seed --env ${{ env.BRANCH_NAME }}
+        working-directory: layers/orm-layer/nodejs/db
 
   # deploy:
   #   name: Deploy ORM models to layer
