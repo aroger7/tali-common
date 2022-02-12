@@ -21,7 +21,6 @@ jobs:
           node-version: '16'
           cache: npm
           cache-dependency-path: layers/orm-layer/nodejs/package-lock.json
-        working-directory: layers/orm-layer/nodejs
       - uses: nelonoel/branch-name@v1.0.1
       - run: npm ci
         working-directory: layers/orm-layer/nodejs
