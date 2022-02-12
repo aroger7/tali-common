@@ -13,7 +13,9 @@ jobs:
   package:
     name: Package ORM layer
     runs-on: ubuntu-latest
-    environment: ${{ env.BRANCH_NAME }}
+    environment:
+      name: ${{ env.BRANCH_NAME }}
+      url: https://github.com
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -41,7 +43,9 @@ jobs:
     name: Run DB migrations and seed scripts
     needs: [package]
     runs-on: ubuntu-latest
-    environment: ${{ env.BRANCH_NAME }}
+    environment:
+      name: ${{ env.BRANCH_NAME }}
+      url: https://github.com
     defaults:
       run:
         working-directory: layers/orm-layer/nodejs
