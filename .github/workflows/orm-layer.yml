@@ -1,21 +1,26 @@
 name: CI/CD for ORM layer
 on:
-  push:
-    branches:
-      - master
-      - dev
-    paths:
-      - 'layers/orm-layer/**'
-  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - master
+  #     - dev
+  #   paths:
+  #     - 'layers/orm-layer/**'
+  # workflow_dispatch:
+  workflow_call:
+    inputs:
+      env:
+        description: The environment to use for this workflow
+        default: dev
+        required: true
+        type: string
 env:
   SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 jobs:
   package:
     name: Package ORM layer
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ env.BRANCH_NAME }}
-      url: https://github.com
+    environment: ${{ inputs.env }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -43,9 +48,10 @@ jobs:
     name: Run DB migrations and seed scripts
     needs: [package]
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ env.BRANCH_NAME }}
-      url: https://github.com
+    # environment:
+    #   name: ${{ env.BRANCH_NAME }}
+    #   url: https://github.com
+    environment: ${{ inputs.env }}
     defaults:
       run:
         working-directory: layers/orm-layer/nodejs
