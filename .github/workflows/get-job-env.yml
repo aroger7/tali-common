@@ -1,0 +1,21 @@
+# This is a workaround workflow to be able to dynamically set the environment field
+# in a job in order to access GA's environment secrets
+name: Get job environment name
+
+on:
+  workflow_call:
+    outputs:
+      env:
+        description: The name of the current environment
+        value: ${{ jobs.get-env.outputs.env }}
+
+jobs:
+  get-env: 
+    name: Get the job environment based on branch and set as output
+    runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.set-env.outputs.env }}
+    steps:
+      - uses: nelonoel/branch-name@v1.0.1
+      - id: set-env
+        run: echo ::set-output name=env::${{ env.BRANCH_NAME }}
