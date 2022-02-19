@@ -61,7 +61,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: echo $GITHUB_WORKSPACE
-      - run: echo ${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+      - run: echo ${{ hashFiles(inputs.artifactHashPath) }}
       - run: echo ${{ format('{0}', hashFiles(format('{0}', inputs.artifactHashPath))) }}
       - id: set-artifact-cache-key
         run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescriptor }}-${{ hashFiles(format('{0}', inputs.artifactHashPath)) }}
