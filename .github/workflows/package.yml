@@ -60,9 +60,9 @@ jobs:
       dependenciesCacheKey: ${{ steps.set-dependencies-cache-key.outputs.key }}
     steps:
       - id: set-artifact-cache-key
-        run: echo "::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath) }}"
+        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath) }}
       - id: set-dependencies-cache-key
-        run: echo "::set-output name-key::${{ runner.os }}-${{inputs.dependenciesKeyDescription}}-${{ hashFiles(inputs.dependenciesHashPath) }}"
+        run: echo ::set-output name=key::${{ runner.os }}-${{inputs.dependenciesKeyDescription}}-${{ hashFiles(inputs.dependenciesHashPath) }}
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
