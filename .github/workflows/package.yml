@@ -61,9 +61,9 @@ jobs:
     steps:
       - run: echo ${{ inputs.artifactHashPath }}
       - id: set-artifact-cache-key
-        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath) }}
+        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(format('{0}', inputs.artifactHashPath)) }}
       - id: set-dependencies-cache-key
-        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.dependenciesKeyDescription }}-${{ hashFiles(inputs.dependenciesHashPath) }}
+        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.dependenciesKeyDescription }}-${{ hashFiles(format('{0}', inputs.dependenciesHashPath)) }}
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
