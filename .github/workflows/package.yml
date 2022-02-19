@@ -59,4 +59,4 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: ${{ inputs.artifactPath }}
-          key: ${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath)) }}
+          key: ${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath) }}
