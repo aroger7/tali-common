@@ -27,7 +27,7 @@ on:
         description: Path to build artifacts to be cached
         default: dist
         type: string
-      artifactKeyDescription:
+      artifactKeyDescriptor:
         description: Descriptor to insert into build artifact cache key
         default: build-artifact
         type: string
@@ -63,9 +63,9 @@ jobs:
       - run: echo ${{ hashFiles('abc123') }}
       - run: echo ${{ format('{0}', hashFiles(format('{0}', inputs.artifactHashPath))) }}
       - id: set-artifact-cache-key
-        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(format('{0}', inputs.artifactHashPath)) }}
+        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescriptor }}-${{ hashFiles(format('{0}', inputs.artifactHashPath)) }}
       - id: set-dependencies-cache-key
-        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.dependenciesKeyDescription }}-${{ hashFiles(format('{0}', inputs.dependenciesHashPath)) }}
+        run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.dependenciesKeyDescriptor }}-${{ hashFiles(format('{0}', inputs.dependenciesHashPath)) }}
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
