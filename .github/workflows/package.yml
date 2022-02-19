@@ -35,6 +35,13 @@ on:
         description: Path to file to use as a hash for the build artifact cache key
         default: serverless.yml
         type: string
+      serverlessAccessKey:
+        description: Serverless access key
+        required: true
+        type: string
+
+env:
+  SERVERLESS_ACCESS_KEY: ${{ inputs.serverlessAccessKey }}
 
 jobs:
   package:
