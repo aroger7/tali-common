@@ -13,7 +13,7 @@ jobs:
   get-env:
     uses: ./.github/workflows/get-job-env.yml
   package:
-  needs: [get-env]
+    needs: [get-env]
     uses: ./.github/workflows/package.yml
     with:
       env: ${{ needs.get-env.outputs.env }}
