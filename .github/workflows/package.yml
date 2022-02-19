@@ -59,6 +59,7 @@ jobs:
       artifactCacheKey: ${{ steps.set-artifact-cache-key.outputs.key }}
       dependenciesCacheKey: ${{ steps.set-dependencies-cache-key.outputs.key }}
     steps:
+      - uses: actions/checkout@v2
       - run: echo $GITHUB_WORKSPACE
       - run: echo ${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
       - run: echo ${{ format('{0}', hashFiles(format('{0}', inputs.artifactHashPath))) }}
@@ -66,7 +67,6 @@ jobs:
         run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescriptor }}-${{ hashFiles(format('{0}', inputs.artifactHashPath)) }}
       - id: set-dependencies-cache-key
         run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.dependenciesKeyDescriptor }}-${{ hashFiles(format('{0}', inputs.dependenciesHashPath)) }}
-      - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
