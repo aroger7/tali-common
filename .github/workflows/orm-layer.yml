@@ -12,43 +12,41 @@ env:
 jobs:
   get-env:
     uses: ./.github/workflows/get-job-env.yml
-  # get-env: 
-  #   name: Get the environment based on branch
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     env: ${{ steps.set-env.outputs.env }}
-  #   steps:
-  #     - uses: nelonoel/branch-name@v1.0.1
-  #     - id: set-env
-  #       run: echo ::set-output name=env::${{ env.BRANCH_NAME }}
   package:
-    name: Package ORM layer
-    runs-on: ubuntu-latest
-    needs: [get-env]
-    environment: ${{ needs.get-env.outputs.env }}
-    steps:
-      - run: echo ${{ needs.get-env.outputs.env }}
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-      - uses: nelonoel/branch-name@v1.0.1
-      - run: npm ci
-        working-directory: layers/orm-layer/nodejs
-      - uses: actions/cache@v2
-        if: ${{ !env.ACT }}
-        with:
-          path: |
-            ~/.npm
-            **/node_modules
-          key: ${{ runner.os }}-deps-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
-      - run: npx serverless package --stage ${{ env.BRANCH_NAME }}
-        working-directory: layers/orm-layer
-      - uses: actions/cache@v2
-        if: ${{ !env.ACT }}
-        with:
-          path: layers/orm-layer/.serverless
-          key: ${{ runner.os }}-${{ hashFiles('layers/orm-layer/serverless.yml') }}
+  needs: [get-env]
+    uses: ./.github/workflows/package.yml
+    with:
+      env: ${{ needs.get-env.outputs.env }}
+      installPath: layers/orm-layer/nodejs
+      buildPath: layers/orm-layer
+      dependenciesHashPath: layers/orm-layer/nodejs/package-lock.json
+      artifactPath: layers/orm-layer/.serverless
+      artifactHashPath: layers/orm-layer/serverless.yml
+  # package:
+  #   name: Package ORM layer
+  #   runs-on: ubuntu-latest
+  #   needs: [get-env]
+  #   environment: ${{ needs.get-env.outputs.env }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: '16'
+  #     - uses: nelonoel/branch-name@v1.0.1
+  #     - run: npm ci
+  #       working-directory: layers/orm-layer/nodejs
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: |
+  #           ~/.npm
+  #           **/node_modules
+  #         key: ${{ runner.os }}-deps-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+  #     - run: npx serverless package --stage ${{ env.BRANCH_NAME }}
+  #       working-directory: layers/orm-layer
+  #     - uses: actions/cache@v2
+  #       with:
+  #         path: layers/orm-layer/.serverless
+  #         key: ${{ runner.os }}-build-artifact-${{ hashFiles('layers/orm-layer/serverless.yml') }}
   
   # deploy:
   #   name: Deploy ORM models to layer

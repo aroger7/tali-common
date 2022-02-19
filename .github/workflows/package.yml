@@ -1,0 +1,62 @@
+name: Build, package and cache a serverless npm application
+
+on:
+  workflow_call:
+    inputs:
+      env:
+        description: The environment name
+        required: true
+        type: string
+      installPath:
+        description: Path to attempt installing npm dependencies in
+        default: src
+        type: string
+      buildPath:
+        description: Path to pass to serverless package command
+        default: src
+        type: string
+      dependenciesKeyDescriptor:
+        description: Descriptor string to insert into cache key for npm dependencies
+        default: dependencies
+        type: string
+      dependenciesHashPath:
+        description: Path to file to use as a hash for the npm dependencies cache key
+        default: package-lock.json
+        type: string
+      artifactPath:
+        description: Path to build artifacts to be cached
+        default: dist
+        type: string
+      artifactKeyDescription:
+        description: Descriptor to insert into build artifact cache key
+        default: build-artifact
+        type: string
+      artifactHashPath:
+        description: Path to file to use as a hash for the build artifact cache key
+        default: serverless.yml
+        type: string
+
+jobs:
+  package:
+    name: Package application
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.env }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: npm ci
+        working-directory: ${{ inputs.installPath }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+            **/node_modules
+          key: ${{ runner.os }}-${{inputs.dependenciesKeyDescription}}-${{ hashFiles(inputs.dependenciesHashPath) }}
+      - run: npx serverless package --stage ${{ inputs.env }}
+        working-directory: ${{ inputs.buildPath }}
+      - uses: actions/cache@v2
+        with:
+          path: ${{ inputs.artifactPath }}
+          key: ${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath)) }}
