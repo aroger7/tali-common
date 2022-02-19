@@ -60,9 +60,6 @@ jobs:
       dependenciesCacheKey: ${{ steps.set-dependencies-cache-key.outputs.key }}
     steps:
       - uses: actions/checkout@v2
-      - run: echo $GITHUB_WORKSPACE
-      - run: echo ${{ hashFiles(inputs.artifactHashPath) }}
-      - run: echo ${{ format('{0}', hashFiles(format('{0}', inputs.artifactHashPath))) }}
       - id: set-artifact-cache-key
         run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescriptor }}-${{ hashFiles(format('{0}', inputs.artifactHashPath)) }}
       - id: set-dependencies-cache-key
@@ -76,7 +73,6 @@ jobs:
           path: |
             ~/.npm
             **/node_modules
-          # key: ${{ runner.os }}-${{inputs.dependenciesKeyDescription}}-${{ hashFiles(inputs.dependenciesHashPath) }}
           key: ${{ steps.set-dependencies-cache-key.outputs.key }}
       - run: npm ci
         if: ${{ !steps.cache-dependencies.outputs.cache-hit }}
@@ -86,7 +82,6 @@ jobs:
         with:
           path: ${{ inputs.artifactPath }}
           key: ${{ steps.set-artifact-cache-key.outputs.key }}
-          # key: ${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath) }}
       - run: npx serverless package --stage ${{ inputs.env }}
         if: ${{ !steps.cache-build-artifacts.outputs.cache-hit }}
         working-directory: ${{ inputs.buildPath }}

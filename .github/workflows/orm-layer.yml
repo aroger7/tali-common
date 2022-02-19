@@ -81,19 +81,24 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - uses: nelonoel/branch-name@v1.0.1
       - uses: actions/cache@v2
-        if: ${{ !env.ACT }}
         with:
           path: |
             ~/.npm
             **/node_modules
-          key: ${{ runner.os }}-deps-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+          # key: ${{ runner.os }}-deps-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+          key: ${{ needs.package.outputs.dependenciesCacheKey }}
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/.npm
+      #       **/node_modules
+      #     key: ${{ runner.os }}-deps-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
       - uses: actions/cache@v2
-        if: ${{ !env.ACT }}
         with:
           path: layers/orm-layer/.serverless
-          key: ${{ runner.os }}-${{ hashFiles('layers/orm-layer/serverless.yml') }}
+          key: ${{ needs.package.outputs.artifactCacheKey }}
+          # key: ${{ runner.os }}-${{ hashFiles('layers/orm-layer/serverless.yml') }}
       # - run: npm ci
       #   working-directory: layers/orm-layer/nodejs
       - name: Get env DB secret
@@ -103,7 +108,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           SECRET_NAME: ${{ secrets.SECRET_NAME }}
-      - run: npx sequelize-cli db:migrate --env ${{ env.BRANCH_NAME }}
+      - run: npx sequelize-cli db:migrate --env ${{ needs.get-env.outputs.env }}
         working-directory: layers/orm-layer/nodejs/db
-      - run: npx sequelize-cli db:seed --env ${{ env.BRANCH_NAME }}
+      - run: npx sequelize-cli db:seed --env ${{ needs.get-env.outputs.env }}
         working-directory: layers/orm-layer/nodejs/db
