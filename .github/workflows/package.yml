@@ -59,6 +59,7 @@ jobs:
       artifactCacheKey: ${{ steps.set-artifact-cache-key.outputs.key }}
       dependenciesCacheKey: ${{ steps.set-dependencies-cache-key.outputs.key }}
     steps:
+      - run: echo $GITHUB_WORKSPACE
       - run: echo ${{ format('{0}', hashFiles(format('{0}', inputs.artifactHashPath))) }}
       - id: set-artifact-cache-key
         run: echo ::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(format('{0}', inputs.artifactHashPath)) }}
