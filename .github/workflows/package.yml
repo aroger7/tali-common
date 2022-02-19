@@ -39,6 +39,13 @@ on:
       serverlessAccessKey:
         description: Serverless access key
         required: true
+    outputs:
+      artifactCacheKey:
+        description: Cache key generated for build artifacts
+        value: ${{ jobs.package.outputs.artifactCacheKey }}
+      dependenciesCacheKey:
+        description: Cache key generated for dependencies
+        value: ${{ jobs.package.outputs.dependenciesCacheKey}}
 
 env:
   SERVERLESS_ACCESS_KEY: ${{ secrets.serverlessAccessKey }}
@@ -48,7 +55,14 @@ jobs:
     name: Package application
     runs-on: ubuntu-latest
     environment: ${{ inputs.env }}
+    outputs:
+      artifactCacheKey: ${{ steps.set-artifact-cache-key.outputs.key }}
+      dependenciesCacheKey: ${{ steps.set-dependencies-cache-key.outputs.key }}
     steps:
+      - id: set-artifact-cache-key
+        run: echo "::set-output name=key::${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath) }}"
+      - id: set-dependencies-cache-key
+        run: echo "::set-output name-key::${{ runner.os }}-${{inputs.dependenciesKeyDescription}}-${{ hashFiles(inputs.dependenciesHashPath) }}"
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
@@ -59,7 +73,8 @@ jobs:
           path: |
             ~/.npm
             **/node_modules
-          key: ${{ runner.os }}-${{inputs.dependenciesKeyDescription}}-${{ hashFiles(inputs.dependenciesHashPath) }}
+          # key: ${{ runner.os }}-${{inputs.dependenciesKeyDescription}}-${{ hashFiles(inputs.dependenciesHashPath) }}
+          key: ${{ steps.set-dependencies-cache-key.outputs.key }}
       - run: npm ci
         if: ${{ !steps.cache-dependencies.outputs.cache-hit }}
         working-directory: ${{ inputs.installPath }}
@@ -67,7 +82,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ inputs.artifactPath }}
-          key: ${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath) }}
+          key: ${{ steps.set-artifact-cache-key.outputs.key }}
+          # key: ${{ runner.os }}-${{ inputs.artifactKeyDescription }}-${{ hashFiles(inputs.artifactHashPath) }}
       - run: npx serverless package --stage ${{ inputs.env }}
         if: ${{ !steps.cache-build-artifacts.outputs.cache-hit }}
         working-directory: ${{ inputs.buildPath }}
