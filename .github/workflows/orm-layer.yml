@@ -22,7 +22,7 @@ jobs:
       dependenciesHashPath: layers/orm-layer/nodejs/package-lock.json
       artifactPath: layers/orm-layer/.serverless
       artifactHashPath: layers/orm-layer/serverless.yml
-      serverlessAccessKey: ${{ env.SERVERLESS_ACCESS_KEY }}
+      serverlessAccessKey: ${{ secrets.SERVERLESS_ACCESS_KEY }}
   # package:
   #   name: Package ORM layer
   #   runs-on: ubuntu-latest
