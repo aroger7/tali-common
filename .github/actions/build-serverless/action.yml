@@ -18,13 +18,12 @@ inputs:
     type: string
   serverlessAccessKey:
     description: Serverless Framework access key
-    # required: true
     type: string
 
 runs:
   using: composite
   steps:
-    - if: ${{ !env.SERVERLESS_ACCESS_KEY }}
+    - if: ${{ inputs.serverlessAccessKey }}
       run: echo "SERVERLESS_ACCESS_KEY=${{ inputs.serverlessAccessKey }}" >> $GITHUB_ENV
       shell: bash
     - id: try-cache
