@@ -1,0 +1,36 @@
+name: Build a Serverless Framework application
+description: Build a Serverless Framework application and cache artifacts
+
+inputs:
+  working-path:
+    description: Working path
+    default: src
+    type: string
+  outpath-path:
+    description: Build artifact output path. Used in caching action
+    default: 
+  cache-key:
+    description: Cache key
+    type: string
+  stage:
+    description: Serverless Framework stage name
+    default: dev
+    type: string
+  serverlessAccessKey:
+    description: Serverless Framework access key
+    default: ${{ env.SERVERLESS_ACCESS_KEY }}
+    type: string
+
+runs:
+  uses: composite
+  steps:
+    - if: ${{ !env.SERVERLESS_ACCESS_KEY }}
+      run: echo "SERVERLESS_ACCESS_KEY=${{ serverlessAccessKey }}" >> $GITHUB_ENV
+    - id: try-cache
+      uses: actions/cache@v2
+      with:
+        path: ${{ inputs.output-path }}
+        key: ${{ steps.cache-key }}
+    - run: npx serverless package --stage ${{ inputs.stage }}
+      if: ${{ !steps.try-cache.outputs.cache-hit }}
+      working-directory: ${{ inputs.working-path }}

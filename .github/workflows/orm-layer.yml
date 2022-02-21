@@ -18,12 +18,19 @@ jobs:
   build:
     needs: [get-env]
     runs-on: ubuntu-latest
+    environment: ${{ needs.get-env.outputs.env }}
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/install-dependencies
         with:
           cache-key: ${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
           path: layers/orm-layer/nodejs
+      - uses: ./.github/actions/build-serverless
+        with:
+          output-path: layers/orm-layer/.serverless
+          working-path: layers/orm-layer
+          cache-key: ${{ runner.os }}-build-artifact-${{ hashFiles('layers/orm-layer/serverless.yml')}}
+          stage: ${{ needs.get-env.outputs.env }}
         # working-directory: layers/orm-layer/nodejs
       # - uses: ./.github/actions/build-serverless.yml
 
