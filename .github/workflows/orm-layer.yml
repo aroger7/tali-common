@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/install-dependencies.yml
+      - uses: ./.github/actions/install-dependencies
         with:
           cache-key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
         # working-directory: layers/orm-layer/nodejs
