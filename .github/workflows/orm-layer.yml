@@ -23,6 +23,7 @@ jobs:
       - uses: ./.github/actions/install-dependencies
         with:
           cache-key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+          path: layers/orm-layer/nodejs
         # working-directory: layers/orm-layer/nodejs
       # - uses: ./.github/actions/build-serverless.yml
 
