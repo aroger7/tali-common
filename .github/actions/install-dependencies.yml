@@ -1,0 +1,35 @@
+name: Install dependencies
+description: Install npm dependencies and cache
+
+inputs:
+  cache-key:
+    description: Cache key
+
+runs:
+  using: "composite"
+  steps:
+    - id: try-cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.npm
+          **/node_modules
+        key: ${{ inputs.cache-key }}
+    - run: npm ci
+      if: ${{ steps.try-cache.outputs.cache-hit }}
+
+# jobs:
+#   install-deps:
+#     name: Install dependencies
+#     runs-on: ubuntu-latest
+#     steps:
+#       - id: try-cache
+#         uses: actions/cache@v2
+#         with:
+#           path: |
+#             ~/.npm
+#             **/node_modules
+#           key: ${{ inputs.cache-key }}
+#       - run: npm ci
+#         if: ${{ steps.try-cache.outputs.cache-hit }}
+#         # working-directory: ${{ inputs.path }}
