@@ -2,11 +2,17 @@ name: Install dependencies
 description: Install npm dependencies and cache
 
 inputs:
+  path:
+    description: Install path
+    default: src
+    type: string
   cache-key:
     description: Cache key
+    type: string
 
 runs:
   using: "composite"
+  working-directory: ${{ inputs.path }}
   steps:
     - id: try-cache
       uses: actions/cache@v2
@@ -15,8 +21,11 @@ runs:
           ~/.npm
           **/node_modules
         key: ${{ inputs.cache-key }}
+      # working-directory: ${{ inputs.path }}
     - run: npm ci
       if: ${{ steps.try-cache.outputs.cache-hit }}
+      # working-directory: ${{ inputs.path }}
+# working-directory: ${{}}
 
 # jobs:
 #   install-deps:
