@@ -8,46 +8,38 @@ on:
       - 'layers/orm-layer/**'
   workflow_dispatch:
 env:
-  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-  # DEPENDENCIES_CACHE_KEY: 
+  SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }} 
 
 jobs:
   get-env:
     uses: ./.github/workflows/get-job-env.yml
+  
+  config-env:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "DEPENDENCIES_CACHE_KEY=${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}" >> $GITHUB_ENV
+      - run: echo "BUILD_ARTIFACTS_CACHE_KEY=${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}" >> $GITHUB_ENV
 
   build:
-    needs: [get-env]
+    needs: [get-env, config-env]
     runs-on: ubuntu-latest
     environment: ${{ needs.get-env.outputs.env }}
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/install-dependencies
         with:
-          cache-key: ${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+          # cache-key: ${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+          cache-key: ${{ env.DEPENDENCIES_CACHE_KEY }}
           path: layers/orm-layer/nodejs
       - uses: ./.github/actions/build-serverless
         with:
           output-path: layers/orm-layer/.serverless
           working-path: layers/orm-layer
-          cache-key: ${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}
+          cache-key: ${{ env.BUILD_ARTIFACTS_CACHE_KEY }}
+          # cache-key: ${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}
           stage: ${{ needs.get-env.outputs.env }}
           serverlessAccessKey: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-        # working-directory: layers/orm-layer/nodejs
-      # - uses: ./.github/actions/build-serverless.yml
-
-
-  # package:
-  #   needs: [get-env]
-  #   uses: ./.github/workflows/package.yml
-  #   with:
-  #     env: ${{ needs.get-env.outputs.env }}
-  #     installPath: layers/orm-layer/nodejs
-  #     buildPath: layers/orm-layer
-  #     dependenciesHashPath: layers/orm-layer/nodejs/package-lock.json
-  #     artifactPath: layers/orm-layer/.serverless
-  #     artifactHashPath: layers/orm-layer/serverless.yml
-  #   secrets:
-  #     serverlessAccessKey: ${{ secrets.SERVERLESS_ACCESS_KEY }}
   
   # deploy:
   #   name: Deploy ORM models to layer

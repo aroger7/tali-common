@@ -17,7 +17,7 @@ inputs:
     default: dev
     type: string
   serverlessAccessKey:
-    description: Serverless Framework access key
+    description: Serverless Framework access key. Optional, can also be set using external env var
     type: string
 
 runs:
