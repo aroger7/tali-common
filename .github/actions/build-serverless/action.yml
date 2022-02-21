@@ -31,7 +31,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: ${{ inputs.output-path }}
-        key: ${{ steps.cache-key }}
+        key: ${{ inputs.cache-key }}
     - run: npx serverless package --stage ${{ inputs.stage }}
       if: ${{ !steps.try-cache.outputs.cache-hit }}
       working-directory: ${{ inputs.working-path }}
