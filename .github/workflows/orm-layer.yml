@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ needs.get-env.outputs.env }}
     steps:
+      - run: echo ${{ env.DEPENDENCIES_CACHE_KEY }}
       - uses: actions/checkout@v2
       - uses: ./.github/actions/install-dependencies
         with:
