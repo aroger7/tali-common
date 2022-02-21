@@ -20,8 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/install-dependencies.yml
-          with:
-            cache-key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+        with:
+          cache-key: ${{ runner.os }}-npm-dependencies-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
         working-directory: layers/orm-layer/nodejs
       # - uses: ./.github/actions/build-serverless.yml
 
