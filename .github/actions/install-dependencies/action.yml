@@ -19,12 +19,10 @@ runs:
       with:
         path: |
           ~/.npm
-          **/node_modules
+          ${{ path }}/node_modules
         key: ${{ inputs.cache-key }}
-      working-directory: ${{ inputs.path }}
     - run: npm ci
       if: ${{ steps.try-cache.outputs.cache-hit }}
-      shell: bash
       working-directory: ${{ inputs.path }}
 # working-directory: ${{}}
 
