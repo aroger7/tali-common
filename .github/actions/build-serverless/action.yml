@@ -6,7 +6,7 @@ inputs:
     description: Working path
     default: src
     type: string
-  outpath-path:
+  output-path:
     description: Build artifact output path. Used in caching action
     default: 
   cache-key:

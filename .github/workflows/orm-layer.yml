@@ -29,7 +29,7 @@ jobs:
         with:
           output-path: layers/orm-layer/.serverless
           working-path: layers/orm-layer
-          cache-key: ${{ runner.os }}-build-artifact-${{ hashFiles('layers/orm-layer/serverless.yml')}}
+          cache-key: ${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}
           stage: ${{ needs.get-env.outputs.env }}
           # serverlessAccessKey: ${{ secrets.SERVER}}
         # working-directory: layers/orm-layer/nodejs
