@@ -76,7 +76,7 @@ jobs:
 
   run-db-updates:
     name: Run DB migrations and seed scripts
-    needs: [get-env, build]
+    needs: [config, build]
     runs-on: ubuntu-latest
     environment: ${{ needs.config.outputs.env }}
     defaults:
