@@ -12,41 +12,39 @@ env:
 
 jobs:
   config:
-    # uses: ./.github/workflows/get-job-env.yml
+    name: Configure workflow environment values
     runs-on: ubuntu-latest
     outputs:
       env: ${{ steps.output.outputs.env }}
       dependencies-cache-key: ${{ steps.output.outputs.dependencies-cache-key }}
       build-artifacts-cache-key: ${{ steps.output.outputs.build-artifacts-cache-key }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: nelonoel/branch-name@v1.0.1
-      - id: output
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get branch name
+        uses: nelonoel/branch-name@v1.0.1
+      - name: Set outputs
+        id: output
         run: |
           echo ::set-output name=env::${{ env.BRANCH_NAME }}
           echo ::set-output name=dependencies-cache-key::${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
           echo ::set-output name=build-artifacts-cache-key::${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}
-      # - run: echo "DEPENDENCIES_CACHE_KEY=${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}" >> $GITHUB_ENV
-      # - run: echo "BUILD_ARTIFACTS_CACHE_KEY=${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}" >> $GITHUB_ENV
-  
-  # config-env:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - run: echo "DEPENDENCIES_CACHE_KEY=${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}" >> $GITHUB_ENV
-  #     - run: echo "BUILD_ARTIFACTS_CACHE_KEY=${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}" >> $GITHUB_ENV
 
   build:
+    name: Install dependencies and package layer
     needs: [config]
     runs-on: ubuntu-latest
     environment: ${{ needs.config.outputs.env }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/install-dependencies
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
         with:
           cache-key: ${{ needs.config.outputs.dependencies-cache-key }}
           path: layers/orm-layer/nodejs
-      - uses: ./.github/actions/build-serverless
+      - name: Package layer
+        uses: ./.github/actions/build-serverless
         with:
           output-path: layers/orm-layer/.serverless
           working-path: layers/orm-layer
@@ -82,24 +80,17 @@ jobs:
       run:
         working-directory: layers/orm-layer/nodejs
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
         with:
           node-version: '16'
-      - uses: ./.github/actions/install-dependencies
+      - name: Install dependencies
+        uses: ./.github/actions/install-dependencies
         with:
           cache-key: ${{ needs.config.outputs.dependencies-cache-key }}
           path: layers/orm-layer/nodejs
-      # - uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       ~/.npm
-      #       **/node_modules
-      #     key: ${{ needs.config.outputs.dependencies-cache-key }}
-      # - uses: actions/cache@v2
-      #   with:
-      #     path: layers/orm-layer/.serverless
-      #     key: ${{ needs.config.outputs.build-artifacts-cache-key }}
       - name: Get env DB secret
         uses: say8425/aws-secrets-manager-actions@v2
         with:
@@ -107,8 +98,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           SECRET_NAME: ${{ secrets.SECRET_NAME }}
-      - run: echo "BRANCH_NAME=${{ needs.config.outputs.env }}" >> $GITHUB_ENV
-      - run: npx sequelize-cli db:migrate --env ${{ needs.config.outputs.env }}
+      - name: Set branch env var for sequelize config to pick up
+        run: echo "BRANCH_NAME=${{ needs.config.outputs.env }}" >> $GITHUB_ENV
+      - name: Run migrations
+        run: npx sequelize-cli db:migrate --env ${{ needs.config.outputs.env }}
         working-directory: layers/orm-layer/nodejs/db
-      - run: npx sequelize-cli db:seed --env ${{ needs.config.outputs.env }}
+      - name: Run seeds
+        run: npx sequelize-cli db:seed --env ${{ needs.config.outputs.env }}
         working-directory: layers/orm-layer/nodejs/db
