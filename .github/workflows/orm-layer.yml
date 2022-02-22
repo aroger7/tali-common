@@ -11,33 +11,48 @@ env:
   SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }} 
 
 jobs:
-  get-env:
-    uses: ./.github/workflows/get-job-env.yml
-  
-  config-env:
+  config:
+    # uses: ./.github/workflows/get-job-env.yml
     runs-on: ubuntu-latest
+    outputs:
+      env: ${{ steps.output.outputs.env }}
+      dependencies-cache-key: ${{ steps.output.outputs.dependencies-cache-key }}
+      build-artifacts-cache-key: ${{ steps.output.outputs.build-artifacts-cache-key }}
     steps:
       - uses: actions/checkout@v2
-      - run: echo "DEPENDENCIES_CACHE_KEY=${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}" >> $GITHUB_ENV
-      - run: echo "BUILD_ARTIFACTS_CACHE_KEY=${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}" >> $GITHUB_ENV
+      - uses: nelonoel/branch-name@v1.0.1
+      - id: output
+        run: |
+          echo ::set-output name=env::${{ env.BRANCH_NAME }}
+          echo ::set-output name=dependencies-cache-key::${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
+          echo ::set-output name=build-artifacts-cache-key::${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}
+      # - run: echo "DEPENDENCIES_CACHE_KEY=${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}" >> $GITHUB_ENV
+      # - run: echo "BUILD_ARTIFACTS_CACHE_KEY=${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}" >> $GITHUB_ENV
+  
+  # config-env:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - run: echo "DEPENDENCIES_CACHE_KEY=${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}" >> $GITHUB_ENV
+  #     - run: echo "BUILD_ARTIFACTS_CACHE_KEY=${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}" >> $GITHUB_ENV
 
   build:
-    needs: [get-env, config-env]
+    needs: [config]
     runs-on: ubuntu-latest
-    environment: ${{ needs.get-env.outputs.env }}
+    environment: ${{ needs.config.outputs.env }}
     steps:
-      - run: echo ${{ env.DEPENDENCIES_CACHE_KEY }}
+      - run: echo ${{  }}
       - uses: actions/checkout@v2
       - uses: ./.github/actions/install-dependencies
         with:
           # cache-key: ${{ runner.os }}-npm-dependencies-cache-${{ hashFiles('layers/orm-layer/nodejs/package-lock.json') }}
-          cache-key: ${{ env.DEPENDENCIES_CACHE_KEY }}
+          cache-key: ${{ needs.config.outputs.dependencies-cache-key }}
           path: layers/orm-layer/nodejs
       - uses: ./.github/actions/build-serverless
         with:
           output-path: layers/orm-layer/.serverless
           working-path: layers/orm-layer
-          cache-key: ${{ env.BUILD_ARTIFACTS_CACHE_KEY }}
+          cache-key: ${{ needs.config.outputs.build-artifacts-cache-key }}
           # cache-key: ${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}
           stage: ${{ needs.get-env.outputs.env }}
           serverlessAccessKey: ${{ secrets.SERVERLESS_ACCESS_KEY }}
@@ -64,7 +79,7 @@ jobs:
     name: Run DB migrations and seed scripts
     needs: [get-env, build]
     runs-on: ubuntu-latest
-    environment: ${{ needs.get-env.outputs.env }}
+    environment: ${{ needs.config.outputs.env }}
     defaults:
       run:
         working-directory: layers/orm-layer/nodejs
@@ -78,11 +93,11 @@ jobs:
           path: |
             ~/.npm
             **/node_modules
-          key: ${{ needs.package.outputs.dependenciesCacheKey }}
+          key: ${{ needs.config.outputs.dependencies-cache-key }}
       - uses: actions/cache@v2
         with:
           path: layers/orm-layer/.serverless
-          key: ${{ needs.package.outputs.artifactCacheKey }}
+          key: ${{ needs.config.outputs.build-artifacts-cache-key }}
       - name: Get env DB secret
         uses: say8425/aws-secrets-manager-actions@v2
         with:
@@ -90,7 +105,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           SECRET_NAME: ${{ secrets.SECRET_NAME }}
-      - run: npx sequelize-cli db:migrate --env ${{ needs.get-env.outputs.env }}
+      - run: npx sequelize-cli db:migrate --env ${{ needs.config.outputs.env }}
         working-directory: layers/orm-layer/nodejs/db
-      - run: npx sequelize-cli db:seed --env ${{ needs.get-env.outputs.env }}
+      - run: npx sequelize-cli db:seed --env ${{ needs.config.outputs.env }}
         working-directory: layers/orm-layer/nodejs/db
