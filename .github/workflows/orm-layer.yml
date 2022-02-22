@@ -41,7 +41,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ needs.config.outputs.env }}
     steps:
-      - run: echo ${{  }}
       - uses: actions/checkout@v2
       - uses: ./.github/actions/install-dependencies
         with:
