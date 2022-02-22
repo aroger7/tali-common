@@ -107,6 +107,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           SECRET_NAME: ${{ secrets.SECRET_NAME }}
+      - run: echo "BRANCH_NAME=${{ needs.config.outputs.env }}" >> $GITHUB_ENV
       - run: npx sequelize-cli db:migrate --env ${{ needs.config.outputs.env }}
         working-directory: layers/orm-layer/nodejs/db
       - run: npx sequelize-cli db:seed --env ${{ needs.config.outputs.env }}
