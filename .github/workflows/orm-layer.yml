@@ -95,7 +95,7 @@ jobs:
           known_hosts: ${{ secrets.AWS_DB_BASTION_KNOWN_HOSTS }}
           name: github-actions
       - name: Open ssh tunnel
-        run: ssh 
+        run: ssh ${{ secrets.AWS_DB_BASTION_USERNAME }}@${{ secrets.AWS_DB_BASTION_KNOWN_HOSTS }}
       - name: Set branch env var for sequelize config to pick up
         run: echo "BRANCH_NAME=${{ needs.config.outputs.env }}" >> $GITHUB_ENV
       - name: Run migrations
