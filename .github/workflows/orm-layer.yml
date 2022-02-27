@@ -88,12 +88,16 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           SECRET_NAME: ${{ secrets.SECRET_NAME }}
+      # - name: Adding Known Hosts
+      #   run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.AWS_DB_BASTION_SSH_PRIVATE_KEY }}
-          known_hosts: ${{ secrets.AWS_DB_BASTION_KNOWN_HOSTS }}
+          known_hosts: "placeholder"
           name: github-actions
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
       - name: Open ssh tunnel
         run: ssh -T ${{ secrets.AWS_DB_BASTION_USERNAME }}@${{ secrets.AWS_DB_BASTION_KNOWN_HOSTS }}
       - name: Set branch env var for sequelize config to pick up
