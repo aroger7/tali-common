@@ -107,3 +107,4 @@ jobs:
           stage: ${{ needs.get-env.outputs.env }}
           serverlessAccessKey: ${{ secrets.SERVERLESS_ACCESS_KEY }}
       - run: npx serverless deploy --stage ${{ needs.config.outputs.env }}
+        working-directory: layers/orm-layer
