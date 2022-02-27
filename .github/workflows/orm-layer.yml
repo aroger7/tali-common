@@ -49,27 +49,8 @@ jobs:
           output-path: layers/orm-layer/.serverless
           working-path: layers/orm-layer
           cache-key: ${{ needs.config.outputs.build-artifacts-cache-key }}
-          # cache-key: ${{ runner.os }}-build-artifact-cache-${{ hashFiles('layers/orm-layer/serverless.yml')}}
           stage: ${{ needs.get-env.outputs.env }}
           serverlessAccessKey: ${{ secrets.SERVERLESS_ACCESS_KEY }}
-  
-  # deploy:
-  #   name: Deploy ORM models to layer
-  #   runs-on: ubuntu-latest
-  #   needs: [run-db-updates]
-  #   environment: ${{ env.BRANCH_NAME }}
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: '14'
-  #     - uses: nelonoel/branch-name@v1.0.1
-  #     - uses: actions/cache@v2
-  #       if: ${{ !env.ACT }}
-  #       with:
-  #         path: layers/orm-layer/.serverless
-  #         key: ${{ runner.os }}-${{ hashFiles('layers/orm-layer/serverless.yml') }}
-  #     - run: npx serverless deploy --stage ${{ env.BRANCH_NAME }}
 
   run-db-updates:
     name: Run DB migrations and seed scripts
@@ -106,3 +87,23 @@ jobs:
       - name: Run seeds
         run: npx sequelize-cli db:seed --env ${{ needs.config.outputs.env }}
         working-directory: layers/orm-layer/nodejs/db
+
+  deploy:
+    name: Deploy ORM models to layer
+    runs-on: ubuntu-latest
+    needs: [config, run-db-updates]
+    environment: ${{ needs.config.outputs.env }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - name: Package layer
+        uses: ./.github/actions/build-serverless
+        with:
+          output-path: layers/orm-layer/.serverless
+          working-path: layers/orm-layer
+          cache-key: ${{ needs.config.outputs.build-artifacts-cache-key }}
+          stage: ${{ needs.get-env.outputs.env }}
+          serverlessAccessKey: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+      - run: npx serverless deploy --stage ${{ needs.config.outputs.env }}
