@@ -1,3 +1,7 @@
+console.log(process.env.host);
+console.log(process.env.port);
+console.log(process.env.username);
+
 module.exports = {
   [process.env.BRANCH_NAME]: {
     username: process.env.username,
