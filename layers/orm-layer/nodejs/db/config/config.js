@@ -5,7 +5,7 @@ module.exports = {
     port: process.env.port,
     // host: process.env.host,
     // host: 'localhost',
-    host: 'tali-db-dev.cobq5f3c8nxj.us-east-1.rds.amazonaws.com',
+    host: 'ec2-18-212-210-183.compute-1.amazonaws.com',
     dialect: process.env.engine
   },
   local: {
