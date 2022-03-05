@@ -100,7 +100,7 @@ jobs:
       - run: pwd
         working-directory: ${{ github.workspace }}
       - name: Open ssh tunnel
-        run: ssh -f -T -i ~/.ssh/github-actions ${{ secrets.AWS_DB_BASTION_USERNAME }}@${{ secrets.AWS_DB_BASTION_HOST }} -L 5432:${{ env.host }}:5432 -v
+        run: ssh -N -f -i ~/.ssh/github-actions ${{ secrets.AWS_DB_BASTION_USERNAME }}@${{ secrets.AWS_DB_BASTION_HOST }} -L 5432:${{ env.host }}:5432 -v
       - name: Set branch env var for sequelize config to pick up
         run: |
           echo "host=${{ secrets.AWS_DB_BASTION_HOST }}" >> $GITHUB_ENV
