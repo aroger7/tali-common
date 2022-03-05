@@ -8,8 +8,8 @@ module.exports = {
     password: process.env.password,
     port: process.env.port,
     // host: process.env.host,
-    // host: 'localhost',
-    host: 'ec2-18-212-210-183.compute-1.amazonaws.com',
+    host: 'localhost',
+    // host: 'ec2-18-212-210-183.compute-1.amazonaws.com',
     dialect: process.env.engine
   },
   local: {
