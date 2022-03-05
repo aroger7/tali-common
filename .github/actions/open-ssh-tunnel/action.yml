@@ -39,5 +39,5 @@ runs:
       run: ssh-keyscan -H ${{ inputs.known-hosts }} >> ~/.ssh/known_hosts
       shell: bash
     - name: Open ssh tunnel
-      run: ssh -N -f -i ~/.ssh/${{ inputs.ssh-private-key-name}} ${{ inputs.username }}@${{ inputs.host }} ${{ inputs.port-forwarding && format('-L {0} -v', inputs.port-forwarding)' || ''}}
+      run: ssh -N -f -i ~/.ssh/${{ inputs.ssh-private-key-name }} ${{ inputs.username }}@${{ inputs.host }} ${{ inputs.port-forwarding && format('-L {0} -v', inputs.port-forwarding) || ''}}
       shell: bash
