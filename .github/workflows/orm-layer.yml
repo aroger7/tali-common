@@ -98,7 +98,8 @@ jobs:
           name: github-actions
       - name: Adding Known Hosts
         run: ssh-keyscan -H ${{ secrets.AWS_DB_BASTION_HOST }} >> ~/.ssh/known_hosts
-      - run: ls -a ~/.ssh
+      - run: pwd
+        working-directory: ${{ github.workspace }}
       - name: Open ssh tunnel
         run: ssh -T -i github-actions ${{ secrets.AWS_DB_BASTION_USERNAME }}@${{ secrets.AWS_DB_BASTION_HOST }}
       - name: Set branch env var for sequelize config to pick up
