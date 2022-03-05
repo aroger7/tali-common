@@ -80,6 +80,7 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
           aws-security-group-id: ${{ secrets.AWS_DB_BASTION_SECURITY_GROUP_ID }}
           port: 5432
+          to-port: 5432
           description: ORM layer CI/CD workflow
       - name: Get env DB secret
         uses: say8425/aws-secrets-manager-actions@v2
