@@ -3,7 +3,8 @@ module.exports = {
     username: process.env.username,
     password: process.env.password,
     port: process.env.port,
-    host: process.env.host,
+    // host: process.env.host,
+    host: 'localhost',
     dialect: process.env.engine
   },
   local: {
