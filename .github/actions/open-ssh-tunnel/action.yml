@@ -37,5 +37,7 @@ runs:
         name: ${{ inputs.ssh-private-key-name }}
     - name: Adding Known Hosts
       run: ssh-keyscan -H ${{ inputs.known-hosts }} >> ~/.ssh/known_hosts
+      shell: bash
     - name: Open ssh tunnel
       run: ssh -N -f -i ~/.ssh/${{ inputs.ssh-private-key-name}} ${{ inputs.username }}@${{ inputs.host }} ${{ inputs.port-forwarding && "-L ${{ inputs.port-forwarding }} -v" || ""}}
+      shell: bash
