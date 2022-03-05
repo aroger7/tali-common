@@ -1,0 +1,41 @@
+name: Open SSH tunnel
+description: Install SSH key and open tunnel to remote server
+
+inputs:
+  ssh-private-key:
+    description: SSH private key to use
+    type: string
+    required: true
+  ssh-private-key-name:
+    description: SSH private key name
+    type: string
+    default: private-key
+  known-hosts:
+    description: Known hosts to add
+    type: string
+    required: true
+  username:
+    description: Remote server username
+    type: string
+    required: true
+  host:
+    description: Remote host
+    type: string
+    required: true
+  port-forwarding:
+    description: String that describes local ports to forward and their destination endpoints
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ inputs.ssh-private-key }}
+        known_hosts: "placeholder"
+        name: ${{ inputs.ssh-private-key-name }}
+    - name: Adding Known Hosts
+      run: ssh-keyscan -H ${{ inputs.known-hosts }} >> ~/.ssh/known_hosts
+    - name: Open ssh tunnel
+      run: ssh -N -f -i ~/.ssh/${{ inputs.ssh-private-key-name}} ${{ inputs.username }}@${{ inputs.host }} ${{ inputs.port-forwarding && "-L ${{ inputs.port-forwarding }} -v" || ""}}

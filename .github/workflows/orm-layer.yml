@@ -80,7 +80,6 @@ jobs:
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
           aws-security-group-id: ${{ secrets.AWS_DB_BASTION_SECURITY_GROUP_ID }}
           port: 22
-          # to-port: 5432
           description: ORM layer CI/CD workflow
       - name: Get env DB secret
         uses: say8425/aws-secrets-manager-actions@v2
@@ -89,18 +88,27 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
           SECRET_NAME: ${{ secrets.SECRET_NAME }}
-      - name: Install SSH key
-        uses: shimataro/ssh-key-action@v2
+      # - name: Install SSH key
+      #   uses: shimataro/ssh-key-action@v2
+      #   with:
+      #     key: ${{ secrets.AWS_DB_BASTION_SSH_PRIVATE_KEY }}
+      #     known_hosts: "placeholder"
+      #     name: github-actions
+      # - name: Adding Known Hosts
+      #   run: ssh-keyscan -H ${{ secrets.AWS_DB_BASTION_HOST }} >> ~/.ssh/known_hosts
+      # - run: pwd
+      #   working-directory: ${{ github.workspace }}
+      # - name: Open ssh tunnel
+      #   run: ssh -N -f -i ~/.ssh/github-actions ${{ secrets.AWS_DB_BASTION_USERNAME }}@${{ secrets.AWS_DB_BASTION_HOST }} -L 5432:${{ env.host }}:5432 -v
+      - name: Open SSH tunnel
+        uses: ./.github/actions/open-ssh-tunnel
         with:
-          key: ${{ secrets.AWS_DB_BASTION_SSH_PRIVATE_KEY }}
-          known_hosts: "placeholder"
-          name: github-actions
-      - name: Adding Known Hosts
-        run: ssh-keyscan -H ${{ secrets.AWS_DB_BASTION_HOST }} >> ~/.ssh/known_hosts
-      - run: pwd
-        working-directory: ${{ github.workspace }}
-      - name: Open ssh tunnel
-        run: ssh -N -f -i ~/.ssh/github-actions ${{ secrets.AWS_DB_BASTION_USERNAME }}@${{ secrets.AWS_DB_BASTION_HOST }} -L 5432:${{ env.host }}:5432 -v
+          ssh-private-key: ${{ secrets.AWS_DB_BASTION_SSH_PRIVATE_KEY }}
+          ssh-private-key-name: github-actions
+          known-hosts: ${{ secrets.AWS_DB_BASTION_HOST }}
+          username: ${{ secrets.AWS_DB_BASTION_USERNAME }}
+          host: ${{ secrets.AWS_DB_BASTION_HOST }}
+          port-forwarding: 5432:${{ env.host }}:5432
       - name: Set branch env var for sequelize config to pick up
         run: echo "BRANCH_NAME=${{ needs.config.outputs.env }}" >> $GITHUB_ENV
       - name: Run migrations
